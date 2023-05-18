@@ -1,0 +1,206 @@
+@startuml Class
+
+namespace Players {
+
+    class PlayerLifetimeScope <<LifetimeScope>> {
+        
+    }
+
+    interface IInputProvider {
+        + IReadOnlyReactiveProperty<bool> HoldAction
+        + IReadOnlyReactiveProperty<Vector3> MoveDirection
+    }
+
+    namespace Impl {
+        class DebugInputProvider {
+            - ReactiveProperty<bool> _holdAction
+            - ReactiveProperty<Vector3> _moveDirection
+        }
+
+        class ReleaseInputProvider {
+            - ReactiveProperty<bool> _holdAction
+            - ReactiveProperty<Vector3> _moveDirection
+        }
+    }
+
+    Players.IInputProvider <|-- Players.Impl.DebugInputProvider
+    Players.IInputProvider <|-- Players.Impl.ReleaseInputProvider
+
+    class PlayerPresenter {}
+
+    class PlayerMover <<MonoBehavior>> {
+        - ReadOnlyReactiveProperty<float> _velocity
+
+        + void UpdatePlayerMoveVelocity()
+        + void UpdatePlayerPosition()
+    }
+
+    class PlayerAnimator <<MonoBehavior>> {
+
+    }
+
+    class PlayerSound <<MonoBehavior>> {
+
+    }
+
+    class PlayerToysHolder {
+        + IReadOnlyReactiveProperty<Toys.Type> CurrentHoldingToy
+
+    }
+
+    PlayerPresenter *-- IInputProvider : Observe Input Event
+    PlayerPresenter *-- PlayerMover : Observe and Action Move
+    PlayerPresenter *-- PlayerAnimator : Observe and Action Animation
+    PlayerPresenter *-- PlayerToysHolder : Transfer Hold Action
+    PlayerPresenter *.. Strength.StrengthParameter
+    PlayerToysHolder *.. Holder.IHoldable : Hold Action Activate
+
+}
+
+namespace Weary {
+
+    interface IWearyAcceptable {
+        + void UpdateStrength()
+    }
+
+    class WearyAcceptable() {
+        
+    }
+
+
+}
+
+namespace Strength {
+
+    class StrengthViewer <<MonoBehavior>> {}
+    
+    class StrengthPresenter {}
+
+    class StrengthParameter {
+        + IReadOnlyReactiveProperty<float> Strength
+        + IReadOnlyReactiveProperty<bool> IHold
+        ==
+        + UpdateStrength(float deltaStrength)
+    }
+
+    StrengthPresenter *-- StrengthViewer : Observe and Action
+    StrengthPresenter *-- StrengthParameter : Observe and Action
+}
+
+Weary.IWearyAcceptable <|.. Strength.StrengthParameter
+
+namespace ParentAnger {
+
+    class AngerGage {}
+
+    class AngerPresenter {}
+
+    class AngerParameter {
+        + IReadOnlyReactiveProperty<float> AngerValue
+        ==
+        + UpdateAngaerValue(float deltaValue)
+    }
+
+    AngerPresenter *-- AngerGage : Update Gage Viewer
+    AngerPresenter *-- AngerParameter : Observe GateValue
+}
+
+namespace Toys {
+
+    class ToyObject <<MonoBehavior>> {
+        + ToyParam param
+    }
+    
+    class ToyParam <<struct>>  {
+        + Type Type
+        + float weght
+        + float point
+    }
+    
+    enum Type {
+        None
+        KittenBike
+        Shinkansen
+        DocterYellow
+        CommandStation
+    }
+    
+    ToyParam -- Type
+    ToyObject *-- ToyParam
+}
+
+namespace Holder {
+
+    interface IHoldable {
+        + IReadOnlyReactiveProperty<bool> IsHold
+        + bool TryHold()
+        + void UnHold()
+    }
+    
+}
+
+Toys.ToyObject ..|> Holder.IHoldable
+
+
+namespace Toybox {
+
+    class ToyboxObject <<MonoBehavior>> {}
+
+    class ToyboxParameter {
+        - List<Toys.Type> _containToysList
+        + IReadOnlyReactiveProperty<float> CurrentPoint
+
+        ==
+        + bool AddToy(Toys.Type)        
+        + bool RemoveToy(int index)
+    }
+
+}
+
+namespace Field {
+
+
+}
+
+namespace Maneger {
+
+    class GameStatusManager {
+        + void ChangeGameStatus()
+    }
+
+    class GameInitializer {
+        + IReadOnlyReactiveProperty<Unit> InitializeCompleted
+        ==
+        + async void Initialize()
+    }
+
+    class ResultGameManager {
+        
+    }
+
+    class TimeManager {
+        + IReadOnlyReactiveProperty<float> BeforeStartTime
+    }
+
+    class GameStatus <<struct>> {
+        + IReadOnlyReactiveProperty<Manager.Type> Status
+        - ReactiveProperty<Manager.Type> _status
+    }
+
+    enum Type {
+        INIT
+        PLAYING
+        RESULT
+    }
+
+    ResultGameManager *.. Toybox.ToyboxParameter : Observe CurrentPoint
+    ResultGameManager *.. ParentAnger.AngerParameter : Observe AngerValue
+
+}
+
+namespace Sound {
+
+}
+
+
+@enduml
