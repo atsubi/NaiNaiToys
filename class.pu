@@ -50,17 +50,19 @@ namespace Players {
 
     PlayerPresenter *-- IInputProvider : Observe Input Event
     PlayerPresenter *-- PlayerMover : Observe and Action Move
+    PlayerMover *-- PlayerToysHolder : Check currentHolding toys to adjust move velocity
     PlayerPresenter *-- PlayerAnimator : Observe and Action Animation
     PlayerPresenter *-- PlayerToysHolder : Transfer Hold Action
-    PlayerPresenter *.. Strength.StrengthParameter
+    PlayerPresenter *.. Strength.StrengthParameter : Check Strength is 0 to unhold CurrentHolding Toy
     PlayerToysHolder *.. Holder.IHoldable : Hold Action Activate
+    PlayerToysHolder *.. Weary.IWearyAcceptable : Update Strength
 
 }
 
 namespace Weary {
 
     interface IWearyAcceptable {
-        + void UpdateStrength()
+        + UpdateStrength(float deltaStrength)
     }
 
     class WearyAcceptable() {
@@ -78,9 +80,7 @@ namespace Strength {
 
     class StrengthParameter {
         + IReadOnlyReactiveProperty<float> Strength
-        + IReadOnlyReactiveProperty<bool> IHold
-        ==
-        + UpdateStrength(float deltaStrength)
+        ==        
     }
 
     StrengthPresenter *-- StrengthViewer : Observe and Action
@@ -98,17 +98,24 @@ namespace ParentAnger {
     class AngerParameter {
         + IReadOnlyReactiveProperty<float> AngerValue
         ==
-        + UpdateAngaerValue(float deltaValue)
+        + AddAngaerValue(float addValue)
     }
+
+    interface VContainer.Unity.IStartable {}
+    interface VContainer.Unity.ITickable {}
 
     AngerPresenter *-- AngerGage : Update Gage Viewer
     AngerPresenter *-- AngerParameter : Observe GateValue
+    AngerPresenter <|.. VContainer.Unity.IStartable
+    AngerPresenter <|.. VContainer.Unity.ITickable
 }
 
 namespace Toys {
 
     class ToyObject <<MonoBehavior>> {
-        + ToyParam param
+        - ToyParam _param
+        ==
+
     }
     
     class ToyParam <<struct>>  {
@@ -126,7 +133,7 @@ namespace Toys {
     }
     
     ToyParam -- Type
-    ToyObject *-- ToyParam
+    ToyObject "0.." -- "1" ToyParam
 }
 
 namespace Holder {
