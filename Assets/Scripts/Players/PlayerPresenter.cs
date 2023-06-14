@@ -34,6 +34,7 @@ namespace Players {
             _iInputProvider.IMoveDirection
                 .Select(v => v.magnitude > 0.1f ? v.normalized : v) // プレイヤーの移動量は0.1～1ユニット
                 .Subscribe( v => {
+                    v.z = 2.0f;
                     UnityEngine.Debug.Log("move" + v);
                     _playerMover.UpdatePlayerPosition(v);
                 });

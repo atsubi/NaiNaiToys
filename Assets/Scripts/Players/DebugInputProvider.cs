@@ -39,7 +39,7 @@ namespace Players {
                 .Subscribe(x => _holdAction.Value = x);
 
             this.UpdateAsObservable()
-                .Select(_ => new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0.0f))
+                .Select(_ => new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 2.0f))
                 .Subscribe(x => _moveDirection.SetValueAndForceNotify(x));
             
             Debug.Log("Initalize Input");
