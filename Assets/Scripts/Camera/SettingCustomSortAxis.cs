@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,10 +13,12 @@ namespace MyCamera {
     [ExecuteInEditMode]
     public class SettingCustomSortAxis : MonoBehaviour
     {
+
         // Start is called before the first frame update
         void Start()
         {
             var camera = GetComponent<Camera>();
+
             camera.transparencySortMode = TransparencySortMode.CustomAxis;
             camera.transparencySortAxis = new Vector3(0.0f, 1.0f, -0.49f);
 
