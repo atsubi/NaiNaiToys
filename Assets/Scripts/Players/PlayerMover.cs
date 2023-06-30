@@ -19,7 +19,7 @@ namespace Players {
         /// <param name="v"></param>
         public void UpdatePlayerPosition(Vector3 v)
         {
-            transform.Translate(v * Time.deltaTime * _velocity);
+            transform.Translate(new Vector3( v.x * Time.deltaTime * _velocity, v.y * Time.deltaTime * _velocity, 0.0f));
         }
 
         /// <summary>

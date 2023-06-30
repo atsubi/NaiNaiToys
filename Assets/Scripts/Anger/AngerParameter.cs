@@ -9,15 +9,17 @@ namespace Anger {
         [Range(0, 100)]
         private ReactiveProperty<float> _angerValue = new ReactiveProperty<float>(0.0f);
 
+        private float _addAnger = 0.5f;
+
         public IReadOnlyReactiveProperty<float> AngerValue => _angerValue;
 
         /// <summary>
         /// 親の怒り値をアップする
         /// </summary>
         /// <param name="addValue"></param>
-        public void AddAngerValue(float addValue)
+        public void AddAngerValue()
         {   
-            _angerValue.Value += addValue;
+            _angerValue.Value += _addAnger;
         }
     }
 }

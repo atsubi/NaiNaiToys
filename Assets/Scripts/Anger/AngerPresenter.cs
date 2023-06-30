@@ -43,7 +43,7 @@ namespace Anger {
         void ITickable.Tick()
         {
             
-            _angerParameter.AddAngerValue(0.05f);
+            _angerParameter.AddAngerValue();
         }
     }
 }
