@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using VContainer;
+using VContainer.Unity;
+
 namespace Players {
 
     /// <summary>
@@ -9,8 +12,8 @@ namespace Players {
     /// </summary>
     public class PlayerMover : MonoBehaviour
     {
-
         // 移動速度(/s)
+        [SerializeField]
         private float _velocity = 5.0f;
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace Manager {
     public class GameStatusManager : MonoBehaviour
     {
         public IReadOnlyReactiveProperty<GameStatus> IGameStatus => _gameStatus;
-        private readonly ReactiveProperty<GameStatus> _gameStatus = new ReactiveProperty<GameStatus>(GameStatus.INITIALIZE);
+        private readonly ReactiveProperty<GameStatus> _gameStatus = new ReactiveProperty<GameStatus>(GameStatus.CLEANING);
 
         /// <summary>
         /// ゲームのステータスを更新する
