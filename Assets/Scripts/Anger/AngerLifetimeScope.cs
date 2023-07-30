@@ -11,15 +11,11 @@ namespace Anger {
         [SerializeField]
         private AngerViewer _angerViwer;
 
-        [SerializeField]
-        private GameStatusManager _gameStatusManager;
-
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterEntryPoint<AngerPresenter>(Lifetime.Singleton);
             builder.Register<AngerParameter>(Lifetime.Singleton).WithParameter("initAngerValue", 0.0f).WithParameter("initAddAngerValue", 0.2f);
             builder.RegisterComponent(_angerViwer);
-            builder.RegisterComponent(_gameStatusManager);
         }
     }
 }

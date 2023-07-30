@@ -11,15 +11,11 @@ namespace TimeManager {
         [SerializeField]
         public TimeViewer _timeViewer;
 
-        [SerializeField]
-        private GameStatusManager _gameStatusManager;
-
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<TimeParameter>(Lifetime.Singleton).WithParameter<int>(200);
+            builder.Register<TimeParameter>(Lifetime.Singleton).WithParameter("timeValue", 200).WithParameter("readyTimeValue", 3);
             builder.RegisterEntryPoint<TimePresenter>(Lifetime.Singleton);
             builder.RegisterComponent(_timeViewer);
-            builder.RegisterComponent(_gameStatusManager);
         }
     }
 }

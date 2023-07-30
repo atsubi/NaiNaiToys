@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,19 +20,20 @@ namespace Players {
         public IReadOnlyReactiveProperty<Vector3> IMoveDirection => _moveDirection;
 
 
-        void Start()
+        bool IInputProvider.InitializeInputEvent(CancellationToken token)
         {
-            InitializeInput().Forget();
-        }
+            InitializeInputEventAsync(token).Forget();
 
+            return true;
+        }
 
         /// <summary>
         /// 入力の初期設定
         /// </summary>
         /// <returns></returns>
-        public async UniTaskVoid InitializeInput()
+        public async UniTaskVoid InitializeInputEventAsync(CancellationToken token)
         {
-            await UniTask.DelayFrame(30);
+            await UniTask.Delay(30, cancellationToken: token);
 
             this.UpdateAsObservable()
                 .Select(_ => Input.GetMouseButton(0))

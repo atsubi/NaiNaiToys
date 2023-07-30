@@ -7,6 +7,10 @@ using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using UnityEditor;
 
+// your custom namespace
+using Toys;
+// ---------------------
+
 # if UNITY_EDITOR
 
 /// <summary>
@@ -31,7 +35,7 @@ public class GetMasterData : Editor {
             try {
                 Debug.Log("読み込み開始");
 
-                string response_text = await DownloadMasterData(masterDataLoader._spreadSheetURL, token);
+                string response_text = await DownloadMasterDataAsync(masterDataLoader._spreadSheetURL, token);
 
                 ToyParamList toyParamList = JsonUtility.FromJson<ToyParamList>(response_text);
             
@@ -72,7 +76,7 @@ public class GetMasterData : Editor {
     /// Googleスプレットシートに保存されたデータをJSON形式で取得する
     /// </summary>
     /// <returns></returns>
-    public async UniTask<string> DownloadMasterData(string spreadsheetURL, CancellationToken token)
+    public async UniTask<string> DownloadMasterDataAsync(string spreadsheetURL, CancellationToken token)
     {
         UnityWebRequest request = UnityWebRequest.Get(spreadsheetURL);
 

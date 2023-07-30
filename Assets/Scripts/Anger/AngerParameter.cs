@@ -30,10 +30,6 @@ namespace Anger {
                 || initAddAngerValue > 10.0f) {
                 throw new ArgumentException("initAddAngerValue is 0 or more and 10 or less.");
             }
-
-            Debug.Log(initAngerValue);
-            Debug.Log(initAddAngerValue);
-
             _angerValue = new ReactiveProperty<float>(initAngerValue);
             _addAngerValue = new ReactiveProperty<float>(initAddAngerValue);
         }

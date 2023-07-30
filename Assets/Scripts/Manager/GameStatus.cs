@@ -6,7 +6,7 @@ namespace Manager {
     public enum GameStatus
     {
         INITIALIZE,
-        PRECLEANING,
+        READYCLEANING,
         CLEANING,
         RESULT,
     }

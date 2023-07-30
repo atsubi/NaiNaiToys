@@ -28,12 +28,23 @@ namespace Anger {
 
         void IStartable.Start()
         {
+            // 怒りゲージが更新されたら、ゲージの表示を更新
             _angerParameter.AngerValue
                 .Subscribe(angerValue => {
                     _angerViewer.UpdateSliderValue(angerValue);
                 })
                 .AddTo(_disposable);
+
+            // ゲーム中は怒りゲージが上昇する
+            Observable
+                .EveryUpdate()
+                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
+                .Subscribe(angerValue => {
+                    _angerParameter.UpdateAngerValue();
+                })
+                .AddTo(_disposable);
             
+            // 怒りゲージがMaxになるとゲームオーバー
             _angerParameter.AngerValue
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
                 .Where(value => value == 100.0f)
@@ -46,7 +57,7 @@ namespace Anger {
 
         void ITickable.Tick()
         {
-            _angerParameter.UpdateAngerValue();
+            
         }
 
         void IDisposable.Dispose() => _disposable.Dispose();

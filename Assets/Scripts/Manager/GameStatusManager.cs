@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UniRx;
 
 namespace Manager {
 
-    public class GameStatusManager : MonoBehaviour
+    public class GameStatusManager
     {
         public IReadOnlyReactiveProperty<GameStatus> IGameStatus => _gameStatus;
-        private readonly ReactiveProperty<GameStatus> _gameStatus = new ReactiveProperty<GameStatus>(GameStatus.CLEANING);
+        private readonly ReactiveProperty<GameStatus> _gameStatus = new ReactiveProperty<GameStatus>(GameStatus.READYCLEANING);
 
         /// <summary>
         /// ゲームのステータスを更新する

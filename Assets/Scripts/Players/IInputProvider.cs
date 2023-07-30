@@ -1,3 +1,5 @@
+using System.Threading;
+
 using UnityEngine;
 
 using Cysharp.Threading.Tasks;
@@ -13,6 +15,8 @@ namespace Players {
     {
         public IReadOnlyReactiveProperty<bool> IHoldAction { get; }
         public IReadOnlyReactiveProperty<Vector3> IMoveDirection { get; }
+
+        bool InitializeInputEvent(CancellationToken token);
     }
 
 }

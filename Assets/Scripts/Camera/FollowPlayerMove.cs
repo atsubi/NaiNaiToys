@@ -20,9 +20,11 @@ namespace MyCamera {
         /// <summary>
         /// プレイヤーの位置に追従する
         /// </summary>
-        void LateUpdate()
+        void Update()
         {
-            this.transform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, -10.0f);
+            Vector3 targetPos = new Vector3(_playerTransform.position.x, _playerTransform.position.y, this.transform.position.z);
+            Vector3 velocity = (targetPos - this.transform.position);
+            this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPos, ref velocity, 1.0f, Time.deltaTime);
         }
     }
 }
