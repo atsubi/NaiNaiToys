@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 using VContainer;
 using VContainer.Unity;
@@ -14,26 +15,22 @@ namespace Toys {
     /// <summary>
     /// おもちゃ単体の制御フロー
     /// </summary>
-    public class ToyPresenter : IStartable, IDisposable, IHoldable {
+    public class ToyPresenter : IDisposable, IAsyncStartable {
 
-        private readonly Holdable _holdable;
+        private readonly ToyVisual _toyVisual;
 
-        private CompositeDisposable _disposable;
+        private CompositeDisposable _disposable = new CompositeDisposable();
 
         [Inject]
-        public ToyPresenter(Holdable holdable)
+        public ToyPresenter(ToyVisual toyVisual)
         {
-            _holdable = holdable;
-        }
-        
-        void IStartable.Start()
-        {
-            
+            _toyVisual = toyVisual;
         }
 
-        bool IHoldable.TryHold() => _holdable.TryHold();
-
-        void IHoldable.UnHold() => _holdable.UnHold();
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            await _toyVisual.CompleteSetVisualAsync;
+        }
 
         void IDisposable.Dispose() => _disposable.Dispose();
 

@@ -19,32 +19,28 @@ namespace Players {
         private ReactiveProperty<Vector3> _moveDirection = new ReactiveProperty<Vector3>();
         public IReadOnlyReactiveProperty<Vector3> IMoveDirection => _moveDirection;
 
-
-        bool IInputProvider.InitializeInputEvent(CancellationToken token)
-        {
-            InitializeInputEventAsync(token).Forget();
-
-            return true;
-        }
+        public UniTask CompleteInputEventSetting => _uniTaskCompletionSource.Task;
+        private readonly UniTaskCompletionSource _uniTaskCompletionSource = new UniTaskCompletionSource();
 
         /// <summary>
         /// 入力の初期設定
         /// </summary>
         /// <returns></returns>
-        public async UniTaskVoid InitializeInputEventAsync(CancellationToken token)
+        void IInputProvider.InitializeInputEvent()
         {
-            await UniTask.Delay(30, cancellationToken: token);
-
             this.UpdateAsObservable()
                 .Select(_ => Input.GetMouseButton(0))
                 .DistinctUntilChanged()
-                .Subscribe(x => _holdAction.Value = x);
+                .Subscribe(x => {
+                    Debug.Log("Hold");
+                    _holdAction.Value = x;
+                });
 
             this.UpdateAsObservable()
                 .Select(_ => new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 2.0f))
                 .Subscribe(x => _moveDirection.SetValueAndForceNotify(x));
             
-            Debug.Log("Initalize Input");
+            _uniTaskCompletionSource.TrySetResult();
         }
     }
 }

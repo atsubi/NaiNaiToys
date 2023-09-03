@@ -1,9 +1,14 @@
+using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Cysharp.Threading.Tasks;
+
 using VContainer;
 using VContainer.Unity;
+
+using UniRx;
 
 namespace Players {
 
@@ -14,7 +19,7 @@ namespace Players {
     {
         // 移動速度(/s)
         [SerializeField]
-        private float _velocity = 5.0f;
+        private float _velocity = 8.0f;
 
         /// <summary>
         /// 引数で指定した量を移動する
