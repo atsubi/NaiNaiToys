@@ -21,12 +21,17 @@ namespace Players
     public class PlayerToyHolder : MonoBehaviour
     {
         // プレイヤーの手の長さ
-        [SerializeField]
+        [Header("手の長さ"), SerializeField]
         private float _playerHandLength;
 
         // 掴み判定がある半径
-        [SerializeField]
+        [Header("判定半径"), SerializeField]
         private float _holdableAreaRadius;
+
+        /// <summary>
+        /// 掴み時の判定円の原点
+        /// </summary>
+        private Vector3 _holdableAreaOriginalPoint;
 
         // おもちゃのレイヤー(掴み時におもちゃのみを確認する)
         [SerializeField]
@@ -67,9 +72,9 @@ namespace Players
                 
                 // 掴み判定
                 Vector3 playerDirection = new Vector3(_playerAnimation.DirectionX, _playerAnimation.DirectionY, 0.0f).normalized;
-                Vector3 holdableAreaOriginalPoint = playerDirection * _playerHandLength + transform.position;
+                _holdableAreaOriginalPoint = playerDirection * _playerHandLength + transform.position;
                 
-                var list = Physics2D.CircleCastAll(holdableAreaOriginalPoint, _playerHandLength, Vector3.zero, .1f, _ignorePlayerMask);
+                var list = Physics2D.CircleCastAll(_holdableAreaOriginalPoint, _playerHandLength, Vector3.zero, .1f, _ignorePlayerMask);
                 var holdableToyList = new List<RaycastHit2D>();
                 holdableToyList.AddRange(list);
                 holdableToyList.Sort((a,b) => (int)Vector3.Distance(a.transform.position, transform.position) - (int)Vector3.Distance(b.transform.position, transform.position));
@@ -116,6 +121,12 @@ namespace Players
                 _holdingToy = null;
                 _holdToy.Value = false;
             }
+        }
+
+
+        void OnDrawGizmos()
+        {
+            GizmosUtility.DrawWireCircle(_holdableAreaOriginalPoint, _playerHandLength);
         }
     }
 

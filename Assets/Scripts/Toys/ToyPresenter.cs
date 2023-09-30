@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 
+using UnityEngine;
+
 using VContainer;
 using VContainer.Unity;
 
@@ -15,24 +17,18 @@ namespace Toys {
     /// <summary>
     /// おもちゃ単体の制御フロー
     /// </summary>
-    public class ToyPresenter : IDisposable, IAsyncStartable {
+    public class ToyPresenter {
 
-        private readonly ToyVisual _toyVisual;
+        private readonly GameObject _toyObject;
+        private readonly ToyParameter _toyParameter;
 
         private CompositeDisposable _disposable = new CompositeDisposable();
 
-        [Inject]
-        public ToyPresenter(ToyVisual toyVisual)
+        public ToyPresenter(GameObject toyObject, ToyParameter toyParameter)
         {
-            _toyVisual = toyVisual;
+            _toyObject = toyObject;
+            _toyParameter = toyParameter;
         }
-
-        public async UniTask StartAsync(CancellationToken cancellation)
-        {
-            await _toyVisual.CompleteSetVisualAsync;
-        }
-
-        void IDisposable.Dispose() => _disposable.Dispose();
 
     }
 }

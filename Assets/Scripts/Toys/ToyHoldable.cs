@@ -9,13 +9,7 @@ namespace Toys {
 
     public class ToyHoldable : MonoBehaviour, IHoldable
     {
-        private Holdable _holdable;
-        
-        [Inject]
-        void Construct(Holdable holdable)
-        {
-            _holdable = holdable;
-        }
+        private Holdable _holdable = new Holdable();
 
         bool IHoldable.TryHold() =>  _holdable.TryHold();
 

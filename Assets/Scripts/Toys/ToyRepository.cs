@@ -10,10 +10,8 @@ using VContainer.Unity;
 
 namespace Toys {
 
-    public class ToyRepository : IDisposable
+    public class ToyRepository
     {
-        private CompositeDisposable _disposable = new CompositeDisposable();
-
         private ToyParamAsset _toyParamAsset;
 
         public ToyRepository(ToyParamAsset toyParamAsset)
@@ -21,12 +19,51 @@ namespace Toys {
             _toyParamAsset = toyParamAsset;
         }
 
-        public int GetToyWeight(int id)
+        public float GetToyWeight(int id)
         {
-            
-            return 0;
+            return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).weight;
         }
 
-        void IDisposable.Dispose() => _disposable.Dispose();
+        public string GetToyName(int id)
+        {
+            return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).name;
+        }
+
+        public float GetToyAngerCareRate(int id)
+        {
+            return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).angerCareRate;
+        }
+
+        public float GetToyPoint(int id)
+        {
+            return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).point;
+        }
+
+
+        /// <summary>
+        /// 指定された出現頻度に従い、ランダムにおもちゃのIDを生成する
+        /// </summary>
+        /// <returns></returns>
+        public int GetToyId()
+        {
+            List<ToyParam> toyParams = _toyParamAsset.ToyParamData.ToyParams;
+
+            float appearanceRateSum = toyParams.Sum(toyParam => toyParam.appearanceRate);
+            float appearanceRundomValue = UnityEngine.Random.Range(0.0f, appearanceRateSum);
+
+            int resultId = 1;
+            float appearanceRateBorder = 0.0f;
+
+            foreach(ToyParam toyParam in toyParams.OrderBy(toyParam => toyParam.id)) {
+                appearanceRateBorder += toyParam.appearanceRate;
+                if (appearanceRundomValue <= appearanceRateBorder) {
+                    resultId = toyParam.id;
+                    break;
+                }
+            }
+
+            return resultId;
+        }
+        
     }
 }

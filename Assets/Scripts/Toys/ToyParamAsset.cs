@@ -36,6 +36,9 @@ namespace Toys {
 
         [SerializeField]
         public float angerCareRate;
+
+        [SerializeField]
+        public float appearanceRate;
     }
 
 }

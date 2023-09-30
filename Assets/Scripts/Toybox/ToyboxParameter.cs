@@ -5,6 +5,8 @@ using UnityEngine;
 
 using UniRx;
 
+using Toys;
+
 namespace Toybox {
     
     /// <summary>
@@ -13,6 +15,13 @@ namespace Toybox {
     public class ToyboxParameter 
     {
         private readonly ReactiveCollection<int> _containToys = new ReactiveCollection<int>();
+
+        private readonly ToyRepository _toyRepository;
+
+        public ToyboxParameter(ToyRepository toyRepository)
+        {
+            _toyRepository = toyRepository;
+        }
         
         public void AddToy(int toyId)
         {
