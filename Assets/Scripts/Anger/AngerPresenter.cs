@@ -40,7 +40,7 @@ namespace Anger {
                 .EveryUpdate()
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
                 .Subscribe(angerValue => {
-                    _angerParameter.UpdateAngerValue();
+                    _angerParameter.IncrementAngerValue();
                 })
                 .AddTo(_disposable);
             

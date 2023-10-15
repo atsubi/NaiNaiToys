@@ -43,11 +43,26 @@ namespace Anger {
             _angerValue.Value = newAddAngerValue;
         }
         
+
         /// <summary>
-        /// 親の怒り値をアップする
+        /// 親の怒り値を鎮める
+        /// </summary>
+        /// <param name="reduceValue"></param>
+        public void ReduceAngerValue(float reduceValue)
+        {
+            if (_angerValue.Value - reduceValue < 0.0f) {
+                _angerValue.Value = 0.0f;
+            } else {
+                _angerValue.Value -= reduceValue;
+            }
+        }
+
+
+        /// <summary>
+        /// 親の怒り値を加算する
         /// </summary>
         /// <param name="addValue"></param>
-        public void UpdateAngerValue()
+        public void IncrementAngerValue()
         {
             if (_angerValue.Value + _addAngerValue.Value > 100.0f) {
                 _angerValue.Value = 100.0f;

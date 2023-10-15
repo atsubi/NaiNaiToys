@@ -34,7 +34,7 @@ namespace Toys {
             return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).angerCareRate;
         }
 
-        public float GetToyPoint(int id)
+        public int GetToyPoint(int id)
         {
             return _toyParamAsset.ToyParamData.ToyParams.Find(toyParam => toyParam.id == id).point;
         }

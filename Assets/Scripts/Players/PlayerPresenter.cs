@@ -58,6 +58,7 @@ namespace Players {
                 })
                 .AddTo(_disposable);
             
+            // ゲームオーバー時は歩行アニメーションをストップ
             _gameStatusManager.IGameStatus
                 .Where(status => status == GameStatus.RESULT)
                 .Subscribe(_ => {
@@ -70,7 +71,8 @@ namespace Players {
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
                 .Subscribe( v => {
                     _playerToyHolder.HoldAction(v);
-                });
+                })
+                .AddTo(_disposable);
             
         }
 

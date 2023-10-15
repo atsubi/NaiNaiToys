@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: ToyList
+  m_EditorClassIdentifier: 
+  m_GroupName: ToyList
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 669a400444371374a95362ad1fb41a01
+  m_SerializeEntries:
+  - m_GUID: 1467f753bff35cb42a114dea44d3c792
+    m_Address: ToyList
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: e8e2379a665f0034a874d7d4e5ef4a6b, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 194719302e9d90140ab5aedf0caf41bf, type: 2}
+    - {fileID: 11400000, guid: e5f5241b21f612c4583c8357d484f422, type: 2}

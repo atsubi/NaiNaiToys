@@ -17,7 +17,7 @@ namespace Toys {
     /// <summary>
     /// おもちゃ単体の制御フロー
     /// </summary>
-    public class ToyPresenter {
+    public class ToyPresenter : IStartable, IDisposable {
 
         private readonly GameObject _toyObject;
         private readonly ToyParameter _toyParameter;
@@ -30,5 +30,12 @@ namespace Toys {
             _toyParameter = toyParameter;
         }
 
+
+        void IStartable.Start()
+        {
+            
+        }
+
+        void IDisposable.Dispose() => _disposable.Dispose();
     }
 }

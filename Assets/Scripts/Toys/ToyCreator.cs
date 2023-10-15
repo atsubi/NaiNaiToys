@@ -1,15 +1,20 @@
+using System.Threading;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.AddressableAssets;
 
 using VContainer;
 using VContainer.Unity;
 
 using UniRx;
 
+using Cysharp.Threading.Tasks;
+
 using TimeManager;
+using TilemapList;
 using Manager;
 
 namespace Toys {
@@ -17,9 +22,11 @@ namespace Toys {
     /// <summary>
     /// おもちゃを生成するファクトリークラス
     /// </summary>
-    public class ToyCreator : IStartable {
+    public class ToyCreator : IAsyncStartable {
 
-        System.Func<int, float, float, ToyPresenter> createToy;
+        System.Func<int, Sprite, float, float, ToyPresenter> createToy;
+    
+        private IList<Sprite> _toyListSprites;
 
         private readonly TimeParameter _timeParameter;
 
@@ -27,8 +34,11 @@ namespace Toys {
 
         private readonly GameStatusManager _gameStatusManager;
 
-        private readonly Tilemap _floorTileMap;
+        private readonly TilemapProvider _tileMapProvider;
 
+        /// <summary>
+        /// 生成予定地に他のおもちゃの存在をチェックする半径
+        /// </summary>
         private readonly float _checkRadius;
 
         /// <summary>
@@ -36,12 +46,13 @@ namespace Toys {
         /// </summary>
         private readonly int _createTimeSpan;
 
+
         [Inject]
-        public ToyCreator(System.Func<int, float, float, ToyPresenter> func,
+        public ToyCreator(System.Func<int, Sprite, float, float, ToyPresenter> func,
             TimeParameter timeParameter,
             ToyRepository toyRepository,
             GameStatusManager gameStatusManager,
-            Tilemap floorTileMap,
+            TilemapProvider tileMapProvider,
             float checkRadius,
             int createTimeSpan)
         {
@@ -49,30 +60,33 @@ namespace Toys {
             _timeParameter = timeParameter;
             _toyRepository = toyRepository;
             _gameStatusManager = gameStatusManager;
-            _floorTileMap = floorTileMap;
+            _tileMapProvider = tileMapProvider;
             _checkRadius = checkRadius;
             _createTimeSpan = createTimeSpan;
         }
 
-        private ToyPresenter Create(int id, float x, float y) => createToy(id, x, y);
+        private ToyPresenter Create(int id, Sprite sprite, float x, float y) => createToy(id, sprite, x, y);
 
 
-        void IStartable.Start()
+        async UniTask IAsyncStartable.StartAsync(CancellationToken cancellation)
         {
+            
+            // おもちゃのスプライトを読み込む
+            _toyListSprites = await Addressables.LoadAssetAsync<IList<Sprite>>("ToyList").WithCancellation(cancellation);
             
             int lastCreateToyTime = _timeParameter.TimeValue.Value;
 
             Vector3 nextPosition = nextCreateToyPosition();
 
-            // オブジェクト生成
+            // _createTimeSpan毎におもちゃをランダムな位置に生成
             Observable
                 .EveryUpdate()
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
                 .Where(_ => lastCreateToyTime - _timeParameter.TimeValue.Value > _createTimeSpan)
                 .Subscribe(_ => {
-                    Debug.Log("Create:" + _toyRepository.GetToyName(_toyRepository.GetToyId()) + " x:" + nextPosition.x + " y:" + nextPosition.y + " z:" + nextPosition.z);
-                    //Create(_toyRepository.GetToyId(), x, 0.0f);
-                    //x += 0.2f;
+                    int id = _toyRepository.GetToyId();
+                    Debug.Log("Create:" + id + " x:" + nextPosition.x + " y:" + nextPosition.y + " z:" + nextPosition.z);
+                    Create(id, _toyListSprites[id], nextPosition.x, nextPosition.y);
                     lastCreateToyTime = _timeParameter.TimeValue.Value;
                     nextPosition = nextCreateToyPosition(); 
                 });
@@ -80,24 +94,45 @@ namespace Toys {
         }
 
 
+        /// <summary>
+        /// 次におもちゃを生成する位置を設定する
+        /// </summary>
+        /// <returns></returns>
         private Vector3 nextCreateToyPosition()
         {
             int checkMask = 1 << LayerMask.NameToLayer("Toy") | 1 << LayerMask.NameToLayer("ToyBox");
 
-            BoundsInt tileBounds = _floorTileMap.cellBounds;
+            Tilemap floorTileMap = _tileMapProvider.FloorTileMap;
+            Tilemap wallTileMap = _tileMapProvider.WallTileMap;
+            Tilemap itemTileMap = _tileMapProvider.ItemTileMap;
+
+            BoundsInt floorTileBounds = floorTileMap.cellBounds;
             Vector3Int nextCellPosition = Vector3Int.zero;
             Vector3 nextWorldPosition = Vector3.zero;
             
             while(true) {
 
-                // ランダムに抽出したセルの位置に床があるか確認                
-                nextCellPosition = new Vector3Int(Random.Range(tileBounds.min.x, tileBounds.max.x + 1), 
-                                            Random.Range(tileBounds.min.y, tileBounds.max.y + 1),
+                // ランダムに抽出したセルの位置に床があるか確認         
+                nextCellPosition = new Vector3Int(Random.Range(floorTileBounds.min.x, floorTileBounds.max.x + 1), 
+                                            Random.Range(floorTileBounds.min.y, floorTileBounds.max.y + 1),
                                             0);
-                if (!_floorTileMap.HasTile(nextCellPosition)) continue;
+                if (!floorTileMap.HasTile(nextCellPosition)) continue;
+
+                // 抽出した位置にアイテムのタイル、壁のタイルが無いか確認
+                nextWorldPosition = floorTileMap.GetCellCenterWorld(nextCellPosition);
+                
+                Vector3Int nextWallCellPosition = wallTileMap.WorldToCell(new Vector3(nextWorldPosition.x,
+                                                                                nextWorldPosition.y,
+                                                                                wallTileMap.transform.position.z));
+                if (wallTileMap.HasTile(nextWallCellPosition)) continue;
+
+                Vector3Int nextItemCellPosition = itemTileMap.WorldToCell(new Vector3(nextWorldPosition.x,
+                                                                                nextWorldPosition.y,
+                                                                                itemTileMap.transform.position.z));
+                if (itemTileMap.HasTile(nextItemCellPosition)) continue;
 
                 // その床の位置周辺に他のおもちゃとおもちゃ箱がないか確認
-                nextWorldPosition = _floorTileMap.GetCellCenterWorld(nextCellPosition);
+                nextWorldPosition = floorTileMap.GetCellCenterWorld(nextCellPosition);
                 nextWorldPosition.z = 2.0f;
                 List<Collider2D> findObjects = Physics2D.OverlapCircleAll(nextWorldPosition, _checkRadius, checkMask).ToList();
                 if (findObjects.Count == 0) {

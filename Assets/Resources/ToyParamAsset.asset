@@ -14,31 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ToyParamData:
     ToyParams:
-    - id: 1
+    - id: 0
       name: minicar
       weight: 5
       point: 3
       angerCareRate: 10
       appearanceRate: 0.4
-    - id: 2
+    - id: 1
       name: nyanbike
       weight: 10
       point: 5
       angerCareRate: 20
       appearanceRate: 0.3
-    - id: 3
+    - id: 2
       name: policecar
       weight: 20
       point: 8
       angerCareRate: 30
       appearanceRate: 0.15
-    - id: 4
+    - id: 3
       name: shinkansen
       weight: 35
       point: 15
       angerCareRate: 40
       appearanceRate: 0.1
-    - id: 5
+    - id: 4
       name: commandstation
       weight: 60
       point: 30

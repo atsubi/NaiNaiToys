@@ -32,7 +32,7 @@ namespace Toys {
         public float weight;
 
         [SerializeField]
-        public float point;
+        public int point;
 
         [SerializeField]
         public float angerCareRate;

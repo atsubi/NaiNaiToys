@@ -34,11 +34,13 @@ namespace Players {
                 .Subscribe(x => {
                     Debug.Log("Hold");
                     _holdAction.Value = x;
-                });
+                })
+                .AddTo(this);
 
             this.UpdateAsObservable()
                 .Select(_ => new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 2.0f))
-                .Subscribe(x => _moveDirection.SetValueAndForceNotify(x));
+                .Subscribe(x => _moveDirection.SetValueAndForceNotify(x))
+                .AddTo(this);
             
             _uniTaskCompletionSource.TrySetResult();
         }

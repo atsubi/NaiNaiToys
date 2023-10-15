@@ -7,6 +7,9 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UniRx.Triggers;
 
+using Toys;
+using Hold;
+
 namespace Toybox {
 
     public class DebugAcceptToyProvider : MonoBehaviour, IAcceptToyProvider
@@ -20,8 +23,10 @@ namespace Toybox {
         void IAcceptToyProvider.InitializeAcceptToyEvent()
         {
             this.OnCollisionEnter2DAsObservable()
+                .Where(collision => collision.gameObject.GetComponent<IHoldable>() != null)
+                .Where(collision => collision.gameObject.GetComponent<ToyIdGettter>() != null)
                 .Subscribe(collision => {
-                    Debug.Log("Toy Enter");
+                    Debug.Log("Toy:" + collision.gameObject.GetComponent<ToyIdGettter>().ReferenceToyID().Value + " is entered.");
                     _acceptToy.SetValueAndForceNotify(collision);
                 });
             
