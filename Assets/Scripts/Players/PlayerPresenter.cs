@@ -73,6 +73,15 @@ namespace Players {
                     _playerToyHolder.HoldAction(v);
                 })
                 .AddTo(_disposable);
+
+            // 掴んでいるおもちゃの重さに応じて移動速度を変更
+            _playerToyHolder.HoldingToyWeight
+                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
+                .Subscribe( weight => {
+                    _playerMover.ReducePlayerMoveVelocity(weight);
+                })
+                .AddTo(_disposable);
+
             
         }
 

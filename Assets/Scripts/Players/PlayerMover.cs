@@ -17,9 +17,19 @@ namespace Players {
     /// </summary>
     public class PlayerMover : MonoBehaviour
     {
-        // 移動速度(/s)
+        // 移動速度の初期値(/s)
         [SerializeField]
-        private float _velocity = 8.0f;
+        private float _baseVelocity = 8.0f;
+
+        // 現在の移動速度
+        public IReadOnlyReactiveProperty<float> Velocity => _velocity;
+        private FloatReactiveProperty _velocity = new FloatReactiveProperty(0.0f);
+
+
+        void Start()
+        {
+            _velocity.Value = _baseVelocity;
+        }
 
         /// <summary>
         /// 引数で指定した量を移動する
@@ -27,16 +37,16 @@ namespace Players {
         /// <param name="v"></param>
         public void UpdatePlayerPosition(Vector3 v)
         {
-            transform.Translate(new Vector3( v.x * Time.deltaTime * _velocity, v.y * Time.deltaTime * _velocity, 0.0f));
+            transform.Translate(new Vector3( v.x * Time.deltaTime * _velocity.Value, v.y * Time.deltaTime * _velocity.Value, 0.0f));
         }
 
         /// <summary>
-        /// 移動速度を更新
+        /// 移動速度を、もっているおもちゃの重さに応じて減らす
         /// </summary>
         /// <param name="velocity"></param>
-        public void UpdatePlayerMoveVelocity(float velocity)
+        public void ReducePlayerMoveVelocity(float weight)
         {
-            this._velocity = velocity;
+            this._velocity.Value = _baseVelocity - _baseVelocity * (weight/100.0f);
         }
 
     }

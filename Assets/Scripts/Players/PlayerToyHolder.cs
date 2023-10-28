@@ -12,6 +12,7 @@ using VContainer.Unity;
 
 using UniRx;
 using Hold;
+using Toys;
 
 namespace Players
 {
@@ -47,6 +48,12 @@ namespace Players
         /// 現在掴んでいるおもちゃのオブジェクト
         /// </summary>
         private GameObject _holdingToy;
+
+        /// <summary>
+        /// つかみ中のおもちゃの重さ
+        /// </summary>
+        public IReadOnlyReactiveProperty<float> HoldingToyWeight => _holdingToyWeight;
+        private FloatReactiveProperty _holdingToyWeight = new FloatReactiveProperty(0.0f);
         
         /// <summary>
         /// 掴み中のおもちゃを表示する位置
@@ -57,10 +64,14 @@ namespace Players
         // 現在の向いてる方向を得るために必要
         private PlayerAnimation _playerAnimation;
 
+        // つかみ中のおもちゃの重さを得るために必要
+        private ToyRepository _toyRepository;
+
         [Inject]
-        public void Construct(PlayerAnimation playerAnimation)
+        public void Construct(PlayerAnimation playerAnimation, ToyRepository toyRepository)
         {
             _playerAnimation = playerAnimation;
+            _toyRepository = toyRepository;
             _ignorePlayerMask = ~(1 << LayerMask.NameToLayer("Player"));
         }
 
@@ -105,6 +116,9 @@ namespace Players
                 // プロパティ設定
                 _holdingToy = holdableToyList[holdedToyNum].collider.transform.gameObject;
                 _holdToy.Value = true;
+
+                int id = _holdingToy.GetComponent<ToyIdGettter>().ReferenceToyID().Value;
+                _holdingToyWeight.Value = _toyRepository.GetToyWeight(id);
             }
 
             // 離す
@@ -120,6 +134,7 @@ namespace Players
                 _holdingToy.transform.position = transform.position + new Vector3(_playerAnimation.DirectionX, _playerAnimation.DirectionY, 0.0f);
                 _holdingToy = null;
                 _holdToy.Value = false;
+                _holdingToyWeight.Value = 0;
             }
         }
 

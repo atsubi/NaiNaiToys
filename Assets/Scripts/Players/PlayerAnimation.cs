@@ -47,5 +47,11 @@ namespace Players {
             }
 
         }
+
+
+        public void UpdateAnimationSpeed(float speed)
+        {
+            _animator.SetFloat("animationSpeed", speed);
+        }
     }
 }
