@@ -9,6 +9,9 @@ namespace Players {
     public class PlayerAnimation : MonoBehaviour
     {
         [SerializeField]
+        private float _baseAnimationSpeed = 2.0f;
+
+        [SerializeField]
         private Animator _animator;
 
         /// <summary>
@@ -25,6 +28,7 @@ namespace Players {
         {
             _animator.SetFloat("x", 0.0f);
             _animator.SetFloat("y", -1.0f);
+            _animator.SetFloat("animationSpeed", _baseAnimationSpeed);
         }
 
         /// <summary>
@@ -49,9 +53,14 @@ namespace Players {
         }
 
 
-        public void UpdateAnimationSpeed(float speed)
+        /// <summary>
+        /// アニメーションの速度を、もっているおもちゃの重さに応じて減らす
+        /// </summary>
+        /// <param name="velocity"></param>
+        public void UpdateAnimationSpeed(float weight)
         {
-            _animator.SetFloat("animationSpeed", speed);
+            float animationSpeed = _baseAnimationSpeed - _baseAnimationSpeed * (weight/100.0f);
+            _animator.SetFloat("animationSpeed", animationSpeed);
         }
     }
 }

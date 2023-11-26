@@ -10,6 +10,7 @@ using Anger;
 using Players;
 using Toybox;
 using Toys;
+using Strength;
 
 namespace Manager {
 
@@ -97,6 +98,11 @@ namespace Manager {
                 };
                 return func;
             }, Lifetime.Scoped);
+
+            // Strength
+            builder.RegisterComponentInHierarchy<StrengthViewer>();
+            builder.RegisterEntryPoint<StrengthPresenter>(Lifetime.Singleton);
+            builder.Register<StrengthParameter>(Lifetime.Singleton);
 
             // Repository
             builder.RegisterComponent(_toyParamAsset);

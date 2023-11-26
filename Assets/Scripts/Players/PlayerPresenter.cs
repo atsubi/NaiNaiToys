@@ -51,6 +51,7 @@ namespace Players {
             // 移動処理
             _iInputProvider.IMoveDirection
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
+                .Where(_ => _playerMover.CanMove.Value == true) // プレイヤーは移動可能か確認
                 .Select(v => v.magnitude > 0.1f ? v.normalized : v) // プレイヤーの移動量は0.1～1ユニット
                 .Subscribe( v => {
                     _playerMover.UpdatePlayerPosition(v);
@@ -69,16 +70,18 @@ namespace Players {
             // つかみ処理
             _iInputProvider.IHoldAction
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
+                .Where(_ => _playerMover.CanMove.Value == false) // 　プレイヤーは移動可能か確認
                 .Subscribe( v => {
                     _playerToyHolder.HoldAction(v);
                 })
                 .AddTo(_disposable);
 
-            // 掴んでいるおもちゃの重さに応じて移動速度を変更
+            // 掴んでいるおもちゃの重さに応じて移動速度とアニメーション速度を変更
             _playerToyHolder.HoldingToyWeight
-                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
+                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
                 .Subscribe( weight => {
                     _playerMover.ReducePlayerMoveVelocity(weight);
+                    _playerAnimation.UpdateAnimationSpeed(weight);
                 })
                 .AddTo(_disposable);
 

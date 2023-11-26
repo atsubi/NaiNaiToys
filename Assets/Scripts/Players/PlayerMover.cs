@@ -17,6 +17,7 @@ namespace Players {
     /// </summary>
     public class PlayerMover : MonoBehaviour
     {
+    
         // 移動速度の初期値(/s)
         [SerializeField]
         private float _baseVelocity = 8.0f;
@@ -24,6 +25,10 @@ namespace Players {
         // 現在の移動速度
         public IReadOnlyReactiveProperty<float> Velocity => _velocity;
         private FloatReactiveProperty _velocity = new FloatReactiveProperty(0.0f);
+
+        // 移動可能フラグ
+        public IReadOnlyReactiveProperty<bool> CanMove;
+        private BoolReactiveProperty _canMove = new BoolReactiveProperty(true);
 
 
         void Start()
@@ -47,6 +52,12 @@ namespace Players {
         public void ReducePlayerMoveVelocity(float weight)
         {
             this._velocity.Value = _baseVelocity - _baseVelocity * (weight/100.0f);
+        }
+
+
+        public void setCanMoveFlag(bool flag)
+        {
+            _canMove.Value = flag;
         }
 
     }

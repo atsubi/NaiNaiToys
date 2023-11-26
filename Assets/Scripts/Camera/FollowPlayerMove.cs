@@ -22,9 +22,10 @@ namespace MyCamera {
         /// </summary>
         void Update()
         {
-            Vector3 targetPos = new Vector3(_playerTransform.position.x, _playerTransform.position.y, this.transform.position.z);
-            Vector3 velocity = (targetPos - this.transform.position);
-            this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPos, ref velocity, 1.0f, Time.deltaTime);
+            this.transform.position = new Vector3(_playerTransform.position.x, _playerTransform.position.y, this.transform.position.z);
+            // Vector3 targetPos = new Vector3(_playerTransform.position.x, _playerTransform.position.y, this.transform.position.z);
+            // Vector3 velocity = (targetPos - this.transform.position);
+            // this.transform.position = Vector3.SmoothDamp(this.transform.position, targetPos, ref velocity, 1.0f, Time.deltaTime);
         }
     }
 }
