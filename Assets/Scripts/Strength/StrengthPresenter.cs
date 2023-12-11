@@ -13,18 +13,20 @@ namespace Strength {
 
     public class StrengthPresenter : IStartable, IDisposable
     {
-        private StrengthParameter _strengthParameter;
-        private StrengthViewer _strengthViewer;
-        private PlayerMover _playerMover;
+        private readonly StrengthParameter _strengthParameter;
+        private readonly StrengthViewer _strengthViewer;
+        private readonly PlayerMover _playerMover;
+        private readonly PlayerToyHolder _playerToyHolder;
 
         private CompositeDisposable _disposable = new CompositeDisposable();
 
         [Inject]
-        public StrengthPresenter(StrengthViewer strengthViewer, StrengthParameter strengthParameter, PlayerMover playerMover)
+        public StrengthPresenter(StrengthViewer strengthViewer, StrengthParameter strengthParameter, PlayerMover playerMover, PlayerToyHolder playerToyHolder)
         {
-            _strengthViewer = strengthViewer;
-            _strengthParameter = strengthParameter;
-            _playerMover = playerMover;
+            this._strengthViewer = strengthViewer;
+            this._strengthParameter = strengthParameter;
+            this._playerMover = playerMover;
+            this._playerToyHolder = playerToyHolder;
         }
 
 
@@ -32,21 +34,40 @@ namespace Strength {
         {
             
             // ストレングスゲージが0になったら、満タンになるまで動けなくする
-            _strengthParameter.StrengthValue
+            this._strengthParameter.StrengthValue
                 .Where(value => value == 0.0f)
                 .Subscribe(_ => {
-                    _playerMover.setCanMoveFlag(false);
-                });
+                    this._playerMover.setCanMoveFlag(false);
+                })
+                .AddTo(_disposable);
 
-            // 動けない間はストレングスゲージを回復させる
+            // おもちゃを持っていない時はストレングスゲージを回復させる
             Observable
                 .EveryUpdate()
-                .Where(_ => _playerMover.CanMove.Value == false)
+                .Where(_ => this._playerToyHolder.HoldToy.Value == false)
                 .Subscribe(_ => {
-
-                });
+                    _strengthParameter.RecoveryStrength();
+                })
+                .AddTo(_disposable);
 
             // おもちゃを持っている時はストレングスゲージを消費する
+            Observable
+                .EveryUpdate()
+                .Where(_ => this._playerToyHolder.HoldToy.Value == true)
+                .Subscribe(_ => {
+                    Debug.Log("Weight = " + _playerToyHolder.HoldingToyWeight.Value);
+                    _strengthParameter.ConsumeStrength(_playerToyHolder.HoldingToyWeight.Value, UnityEngine.Time.deltaTime);
+                    
+                })
+                .AddTo(_disposable);
+
+
+            // ストレグスゲージの値に応じて、表示も更新する
+            _strengthParameter.StrengthValue
+                .Subscribe(value => {
+                    _strengthViewer.AdjustForegage(value);
+                })
+                .AddTo(_disposable);
             
 
         }

@@ -27,11 +27,11 @@ namespace Players {
         private FloatReactiveProperty _velocity = new FloatReactiveProperty(0.0f);
 
         // 移動可能フラグ
-        public IReadOnlyReactiveProperty<bool> CanMove;
+        public IReadOnlyReactiveProperty<bool> CanMove => _canMove;
         private BoolReactiveProperty _canMove = new BoolReactiveProperty(true);
 
-
-        void Start()
+        [Inject]
+        public void Construct()
         {
             _velocity.Value = _baseVelocity;
         }

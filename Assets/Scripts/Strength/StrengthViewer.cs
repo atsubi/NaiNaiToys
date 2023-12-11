@@ -51,7 +51,7 @@ namespace Strength {
         /// ストレングの残量に応じて、残量ゲージの色と表示量を調整
         /// </summary>
         /// <param name="Strength"></param>
-        void AdjustForegage(float strength)
+        public void AdjustForegage(float strength)
         {
             // 残量表示を更新 
             _foregageImage.fillAmount = strength / 100.0f;

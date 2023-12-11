@@ -70,7 +70,7 @@ namespace Players {
             // つかみ処理
             _iInputProvider.IHoldAction
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
-                .Where(_ => _playerMover.CanMove.Value == false) // 　プレイヤーは移動可能か確認
+                .Where(_ => _playerMover.CanMove.Value == true) // 　プレイヤーは移動可能か確認
                 .Subscribe( v => {
                     _playerToyHolder.HoldAction(v);
                 })

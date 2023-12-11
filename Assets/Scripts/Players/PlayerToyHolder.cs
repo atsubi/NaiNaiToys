@@ -41,7 +41,7 @@ namespace Players
         /// <summary>
         /// おもちゃを掴み中かの判定
         /// </summary>
-        public IReadOnlyAsyncReactiveProperty<bool> HoldToy;
+        public IReadOnlyReactiveProperty<bool> HoldToy => _holdToy;
         private BoolReactiveProperty _holdToy = new BoolReactiveProperty(false);
 
         /// <summary>
@@ -77,6 +77,7 @@ namespace Players
 
         public void HoldAction(bool action)
         {
+            Debug.Log("Hold Action");
 
             // 掴む
             if (action == true) {
@@ -115,10 +116,14 @@ namespace Players
                 
                 // プロパティ設定
                 _holdingToy = holdableToyList[holdedToyNum].collider.transform.gameObject;
-                _holdToy.Value = true;
 
                 int id = _holdingToy.GetComponent<ToyIdGettter>().ReferenceToyID().Value;
                 _holdingToyWeight.Value = _toyRepository.GetToyWeight(id);
+
+                _holdToy.Value = true;
+
+                
+                
             }
 
             // 離す
