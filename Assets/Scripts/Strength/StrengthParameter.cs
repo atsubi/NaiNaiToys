@@ -39,8 +39,20 @@ namespace Strength
         /// ストレングスゲージを回復させる 
         /// </summary>
         /// <returns></returns>
-        public void RecoveryStrength() {
+        public void RecoveryStrengthCanMove() {
             _strengthValue.Value += 1.0f;
+
+            if (_strengthValue.Value >= 100.0f) {
+                _strengthValue.Value = 100.0f;
+            }
+        }
+
+                /// <summary>
+        /// ストレングスゲージを回復させる 
+        /// </summary>
+        /// <returns></returns>
+        public void RecoveryStrengthCannotMove() {
+            _strengthValue.Value += 0.3f;
 
             if (_strengthValue.Value >= 100.0f) {
                 _strengthValue.Value = 100.0f;

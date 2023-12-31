@@ -39,6 +39,7 @@ namespace Strength {
                 .Subscribe(_ => {
                     this._playerToyHolder.HoldAction(false);
                     this._playerMover.setCanMoveFlag(false);
+                    this._strengthViewer.GrayUIPanel();
                 })
                 .AddTo(_disposable);
 
@@ -48,18 +49,31 @@ namespace Strength {
                 .Where(value => value == 100.0f)
                 .Subscribe(_ => {
                     this._playerMover.setCanMoveFlag(true);
+                    this._strengthViewer.WhiteUIPanel();
                 })
                 .AddTo(_disposable);
 
 
-            // おもちゃを持っていない時はストレングスゲージを回復させる
+            // おもちゃを持っていない且つ動ける時はストレングスゲージを急速回復させる
             Observable
                 .EveryUpdate()
                 .Where(_ => this._playerToyHolder.HoldToy.Value == false)
+                .Where(_ => _playerMover.CanMove.Value == true)
                 .Subscribe(_ => {
-                    _strengthParameter.RecoveryStrength();
+                    _strengthParameter.RecoveryStrengthCanMove();
                 })
                 .AddTo(_disposable);
+
+            // おもちゃを持っていない且つ動けない時はストレングスゲージを緩やかに回復させる
+            Observable
+                .EveryUpdate()
+                .Where(_ => this._playerToyHolder.HoldToy.Value == false)
+                .Where(_ => _playerMover.CanMove.Value == false)
+                .Subscribe(_ => {
+                    _strengthParameter.RecoveryStrengthCannotMove();
+                })
+                .AddTo(_disposable);
+
 
             // おもちゃを持っている時はストレングスゲージを消費する
             Observable
@@ -76,10 +90,10 @@ namespace Strength {
             // ストレグスゲージの値に応じて、表示も更新する
             _strengthParameter.StrengthValue
                 .Subscribe(value => {
-                    _strengthViewer.AdjustForegage(value);
+                    _strengthViewer.AdjustForgage(value);
+                    _strengthViewer.UpdateForgageImageSprite(value);
                 })
                 .AddTo(_disposable);
-            
 
         }
 
