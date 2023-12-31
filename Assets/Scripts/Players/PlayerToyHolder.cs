@@ -38,6 +38,13 @@ namespace Players
         [SerializeField]
         private int _ignorePlayerMask;
 
+
+        /// <summary>
+        /// おもちゃの掴みアクション成功時に通知するイベント
+        /// </summary>
+        public IObservable<Unit> ToyHoldActionEvent => _toyHoldActionEvent;
+        private Subject<Unit> _toyHoldActionEvent = new Subject<Unit>();
+
         /// <summary>
         /// おもちゃを掴み中かの判定
         /// </summary>
@@ -122,7 +129,8 @@ namespace Players
 
                 _holdToy.Value = true;
 
-                
+                // イベント通知
+                _toyHoldActionEvent.OnNext(Unit.Default);
                 
             }
 

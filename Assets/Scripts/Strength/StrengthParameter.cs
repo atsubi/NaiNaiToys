@@ -29,6 +29,10 @@ namespace Strength
             float consume = ( Mathf.Pow((weight - 3.0f), 2) / Mathf.Pow(weight, 2) ) * 30.0f * delta;
             _strengthValue.Value -= consume;
 
+            if (_strengthValue.Value < 0.0f) {
+                _strengthValue.Value = 0.0f;
+            }
+
         }
 
         /// <summary>

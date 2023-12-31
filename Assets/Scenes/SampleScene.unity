@@ -9436,7 +9436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _targetTransform: {fileID: 565489536}
-  _offset: {x: 1.5, y: 1.5, z: 0}
+  _offset: {x: 1, y: 1, z: 0}
   _foregageImage: {fileID: 1796165246}
 --- !u!1 &1204281546
 GameObject:

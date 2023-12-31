@@ -58,6 +58,15 @@ namespace Players {
                     _playerAnimation.UpdateAnimatorParam(v.x, v.y);
                 })
                 .AddTo(_disposable);
+
+            
+            // プレイヤーが移動できない場合はアニメーションをストップ
+            _playerMover.CanMove
+                .Where(value => value == false)
+                .Subscribe(_ => {
+                    _playerAnimation.UpdateAnimatorParam(0.0f, 0.0f);
+                })
+                .AddTo(_disposable);
             
             // ゲームオーバー時は歩行アニメーションをストップ
             _gameStatusManager.IGameStatus

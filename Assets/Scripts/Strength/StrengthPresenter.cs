@@ -33,13 +33,24 @@ namespace Strength {
         void IStartable.Start()
         {
             
-            // ストレングスゲージが0になったら、満タンになるまで動けなくする
+            // ストレングスゲージが0になったら、おもちゃを落として、満タンになるまで動けなくする
             this._strengthParameter.StrengthValue
                 .Where(value => value == 0.0f)
                 .Subscribe(_ => {
+                    this._playerToyHolder.HoldAction(false);
                     this._playerMover.setCanMoveFlag(false);
                 })
                 .AddTo(_disposable);
+
+            
+            // ストレングスゲージが100になったら、再び動けるようになる
+            this._strengthParameter.StrengthValue
+                .Where(value => value == 100.0f)
+                .Subscribe(_ => {
+                    this._playerMover.setCanMoveFlag(true);
+                })
+                .AddTo(_disposable);
+
 
             // おもちゃを持っていない時はストレングスゲージを回復させる
             Observable
