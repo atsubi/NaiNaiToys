@@ -47,9 +47,8 @@ namespace Anger {
             // 怒りゲージがMaxになるとゲームオーバー
             _angerParameter.AngerValue
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
-                .Where(value => value == 100.0f)
-                .Subscribe(value => {
-                    UnityEngine.Debug.Log("GameOver!");
+                .FirstOrDefault(value => value == 100.0f)
+                .Subscribe(value => {                    
                     _gameStatusManager.ChangeGameStatus(GameStatus.RESULT);
                 })
                 .AddTo(_disposable);

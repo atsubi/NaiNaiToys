@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.AddressableAssets;
+
 
 using VContainer;
 using VContainer.Unity;
@@ -16,25 +16,28 @@ using Cysharp.Threading.Tasks;
 using TimeManager;
 using TilemapList;
 using Manager;
+using System;
 
 namespace Toys {
 
     /// <summary>
     /// おもちゃを生成するファクトリークラス
     /// </summary>
-    public class ToyCreator : IAsyncStartable {
-
+    public class ToyCreator : IAsyncStartable, IDisposable {
+        
         System.Func<int, Sprite, float, float, ToyPresenter> createToy;
-    
-        private IList<Sprite> _toyListSprites;
 
         private readonly TimeParameter _timeParameter;
 
         private readonly ToyRepository _toyRepository;
 
+        private readonly ToySpriteLoader _toySpriteLoader;
+
         private readonly GameStatusManager _gameStatusManager;
 
         private readonly TilemapProvider _tileMapProvider;
+
+        private CompositeDisposable _disposable = new CompositeDisposable();
 
         /// <summary>
         /// 生成予定地に他のおもちゃの存在をチェックする半径
@@ -51,6 +54,7 @@ namespace Toys {
         public ToyCreator(System.Func<int, Sprite, float, float, ToyPresenter> func,
             TimeParameter timeParameter,
             ToyRepository toyRepository,
+            ToySpriteLoader toySpriteLoader,
             GameStatusManager gameStatusManager,
             TilemapProvider tileMapProvider,
             float checkRadius,
@@ -59,6 +63,7 @@ namespace Toys {
             createToy = func;
             _timeParameter = timeParameter;
             _toyRepository = toyRepository;
+            _toySpriteLoader = toySpriteLoader;
             _gameStatusManager = gameStatusManager;
             _tileMapProvider = tileMapProvider;
             _checkRadius = checkRadius;
@@ -70,9 +75,11 @@ namespace Toys {
 
         async UniTask IAsyncStartable.StartAsync(CancellationToken cancellation)
         {
-            
             // おもちゃのスプライトを読み込む
-            _toyListSprites = await Addressables.LoadAssetAsync<IList<Sprite>>("ToyList").WithCancellation(cancellation);
+            _toySpriteLoader.LoadToySprite(cancellation);
+
+            // スプライト読み込み完了まで待機
+            await _toySpriteLoader.CompleteToySpriteLoading;
             
             int lastCreateToyTime = _timeParameter.TimeValue.Value;
 
@@ -86,10 +93,12 @@ namespace Toys {
                 .Subscribe(_ => {
                     int id = _toyRepository.GetToyId();
                     Debug.Log("Create:" + id + " x:" + nextPosition.x + " y:" + nextPosition.y + " z:" + nextPosition.z);
-                    Create(id, _toyListSprites[id], nextPosition.x, nextPosition.y);
+                    Create(id, _toySpriteLoader.GetToySprite(id), nextPosition.x, nextPosition.y);
                     lastCreateToyTime = _timeParameter.TimeValue.Value;
                     nextPosition = nextCreateToyPosition(); 
-                });
+                })
+                .AddTo(_disposable);
+                
 
         }
 
@@ -113,8 +122,8 @@ namespace Toys {
             while(true) {
 
                 // ランダムに抽出したセルの位置に床があるか確認         
-                nextCellPosition = new Vector3Int(Random.Range(floorTileBounds.min.x, floorTileBounds.max.x + 1), 
-                                            Random.Range(floorTileBounds.min.y, floorTileBounds.max.y + 1),
+                nextCellPosition = new Vector3Int(UnityEngine.Random.Range(floorTileBounds.min.x, floorTileBounds.max.x + 1), 
+                                            UnityEngine.Random.Range(floorTileBounds.min.y, floorTileBounds.max.y + 1),
                                             0);
                 if (!floorTileMap.HasTile(nextCellPosition)) continue;
 
@@ -144,5 +153,7 @@ namespace Toys {
             
             return nextWorldPosition;
         }
+
+        void IDisposable.Dispose() => _disposable.Dispose();
     }
 }

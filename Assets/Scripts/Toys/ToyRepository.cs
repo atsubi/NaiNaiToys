@@ -41,6 +41,16 @@ namespace Toys {
 
 
         /// <summary>
+        /// 登録されているおもちゃの種類数を返す
+        /// </summary>
+        /// <returns></returns>
+        public int GetNumOfToyType()
+        {
+            return _toyParamAsset.ToyParamData.ToyParams.Count;
+        }
+
+
+        /// <summary>
         /// 指定された出現頻度に従い、ランダムにおもちゃのIDを生成する
         /// </summary>
         /// <returns></returns>

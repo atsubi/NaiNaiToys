@@ -26,9 +26,17 @@ namespace Players {
         [Inject]
         public void Construct()
         {
+            InitalizeAnimationParam();
+            _animator.SetFloat("animationSpeed", _baseAnimationSpeed);
+        }
+
+        /// <summary>
+        /// アニメーションの初期値
+        /// </summary>
+        public void InitalizeAnimationParam()
+        {
             _animator.SetFloat("x", 0.0f);
             _animator.SetFloat("y", -1.0f);
-            _animator.SetFloat("animationSpeed", _baseAnimationSpeed);
         }
 
         /// <summary>

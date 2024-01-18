@@ -11,6 +11,9 @@ using Players;
 using Toybox;
 using Toys;
 using Strength;
+using Result;
+using UnityEditor.AddressableAssets.Build.Layout;
+using Unity.VisualScripting;
 
 namespace Manager {
 
@@ -19,6 +22,15 @@ namespace Manager {
     /// </summary>
     public class GameLifetimeScope : LifetimeScope
     {
+
+        ///////////
+        
+        // Time
+        [Header("1ゲームの時間"), SerializeField]
+        private int _timeValue = 200;
+
+        ///////////
+        
         ///////////
         
         // Anger
@@ -30,6 +42,10 @@ namespace Manager {
         // Toybox
         [SerializeField]
         private ToyboxUIViewer _toyboxUIViewer;
+
+        [Header("クリアに必要なスコア"), SerializeField]
+        private float _cleardScore = 100;
+
 
         ///////////
         
@@ -55,7 +71,7 @@ namespace Manager {
             builder.Register<GameStatusManager>(Lifetime.Singleton);
 
             // TimeManager
-            builder.Register<TimeParameter>(Lifetime.Singleton).WithParameter("timeValue", 200).WithParameter("readyTimeValue", 3);
+            builder.Register<TimeParameter>(Lifetime.Singleton).WithParameter("timeValue", _timeValue).WithParameter("readyTimeValue", 3);
             builder.RegisterEntryPoint<TimePresenter>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<TimeViewer>();
 
@@ -75,7 +91,7 @@ namespace Manager {
             builder.RegisterComponentInHierarchy<DebugAcceptToyProvider>().AsImplementedInterfaces();
             builder.RegisterComponentInHierarchy<ToyboxUIViewer>();
             builder.RegisterEntryPoint<ToyboxPresenter>(Lifetime.Singleton);
-            builder.Register<ToyboxParameter>(Lifetime.Singleton);
+            builder.Register<ToyboxParameter>(Lifetime.Singleton).WithParameter("cleardScore", _cleardScore);
 
             // TileMapList
             builder.RegisterComponentInHierarchy<TilemapProvider>();
@@ -83,6 +99,8 @@ namespace Manager {
             // Toys
             builder.RegisterEntryPoint<ToyCreator>(Lifetime.Singleton).WithParameter("checkRadius", _checkRadius).WithParameter("createTimeSpan", _createTimeSpan);
             builder.Register<ToyParameter>(Lifetime.Transient);
+            builder.Register<ToySpriteLoader>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<ToyPointListViewer>();
 
             builder.RegisterFactory<int, Sprite, float, float, ToyPresenter>(container => 
             {
@@ -107,6 +125,10 @@ namespace Manager {
             // Repository
             builder.RegisterComponent(_toyParamAsset);
             builder.Register<ToyRepository>(Lifetime.Singleton);
+
+            // Result
+            builder.RegisterComponentInHierarchy<ResultViewer>();
+            builder.RegisterEntryPoint<ResultPresenter>(Lifetime.Singleton);
         }
     }
 }

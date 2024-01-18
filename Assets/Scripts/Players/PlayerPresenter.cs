@@ -48,6 +48,15 @@ namespace Players {
             // 入力イベント設定
             await _iInputProvider.CompleteInputEventSetting;
 
+            // Ready時は初期位置に移動
+            _gameStatusManager.IGameStatus
+                .FirstOrDefault(status => status == GameStatus.READYCLEANING)
+                .Subscribe(_ => {
+                    _playerMover.InitializePlayerPosition();                    
+                    _playerAnimation.InitalizeAnimationParam();
+                })
+                .AddTo(_disposable);
+
             // 移動処理
             _iInputProvider.IMoveDirection
                 .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING) // 掃除中のみ入力受付
@@ -58,7 +67,6 @@ namespace Players {
                     _playerAnimation.UpdateAnimatorParam(v.x, v.y);
                 })
                 .AddTo(_disposable);
-
             
             // プレイヤーが移動できない場合はアニメーションをストップ
             _playerMover.CanMove
@@ -70,7 +78,7 @@ namespace Players {
             
             // ゲームオーバー時は歩行アニメーションをストップ
             _gameStatusManager.IGameStatus
-                .Where(status => status == GameStatus.RESULT)
+                .FirstOrDefault(status => status == GameStatus.RESULT)
                 .Subscribe(_ => {
                     _playerAnimation.UpdateAnimatorParam(0.0f, 0.0f);
                 })

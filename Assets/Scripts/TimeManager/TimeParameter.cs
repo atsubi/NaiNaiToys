@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 
 using VContainer;
 using VContainer.Unity;
+using Manager;
 
 namespace TimeManager {
 
@@ -23,12 +24,17 @@ namespace TimeManager {
         IntReactiveProperty _readyTimeValue;
         public IReadOnlyReactiveProperty<int> ReadyTimeValue => _readyTimeValue;
 
+        private readonly GameStatusManager _gameStatusManager;
+
         private int _initTimeValue;
         private int _initReadyTimeValue;
 
+
         [Inject]
-        public TimeParameter(int timeValue, int readyTimeValue)
+        public TimeParameter(GameStatusManager gameStatusManager, int timeValue, int readyTimeValue)
         {
+            _gameStatusManager = gameStatusManager;
+
             if (timeValue <= 0) {
                 throw new System.ArgumentException("timeValue is 1 or more.");
             }
@@ -50,13 +56,18 @@ namespace TimeManager {
         /// <returns></returns>
         public async UniTaskVoid PlayReadyTimeCountDownAsync(CancellationToken token) 
         {
+            token.ThrowIfCancellationRequested();
+
+            _readyTimeValue.Value = _initReadyTimeValue;
+
             await UniTask.Delay(500, cancellationToken: token);
             _readyTimeValue.SetValueAndForceNotify(_readyTimeValue.Value);
 
-            while (!token.IsCancellationRequested) {
+            while (!token.IsCancellationRequested
+                    && _gameStatusManager.IGameStatus.Value == GameStatus.READYCLEANING) {
                 await UniTask.Delay(1000, cancellationToken: token);
                 _readyTimeValue.Value--;
-                if (_readyTimeValue.Value == 0) return;
+                if (_readyTimeValue.Value == 0) break;
             }
         }
 
@@ -68,14 +79,17 @@ namespace TimeManager {
         /// <returns></returns>
         public async UniTaskVoid PlayTimeCountDownAsync(CancellationToken token) 
         {
+            token.ThrowIfCancellationRequested();
+
+            _timeValue.Value = _initTimeValue;
+
             await UniTask.Delay(500, cancellationToken: token);
             _readyTimeValue.SetValueAndForceNotify(_timeValue.Value);
 
             while (!token.IsCancellationRequested) {
-                
                 await UniTask.Delay(1000, cancellationToken: token);
                 _timeValue.Value--;
-                if (_timeValue.Value == 0) return;
+                if (_timeValue.Value == 0) break;
             }
         }
 

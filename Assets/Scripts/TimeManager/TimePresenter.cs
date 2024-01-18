@@ -23,7 +23,7 @@ namespace TimeManager {
 
         private CompositeDisposable _disposable = new CompositeDisposable();
         
-        private CancellationToken token = new CancellationTokenSource().Token;
+        private CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
         [Inject]
         public TimePresenter(TimeViewer timeViewer, TimeParameter timeParameter, GameStatusManager gameStatusManager) 
@@ -35,9 +35,11 @@ namespace TimeManager {
 
         void IStartable.Start()
         {
+            CancellationToken token = _tokenSource.Token;
+
             // ゲームステータスがReadyとなったら、ReadyTimeValueのカウントダウン開始
             _gameStatusManager.IGameStatus
-                .Where(status => status == GameStatus.READYCLEANING)
+                .FirstOrDefault(status => status == GameStatus.READYCLEANING)
                 .Subscribe(_ => {
                     _timeViwer.ClearReadyTimeText();
                     _timeViwer.VisibleReadyTimeText(true);
@@ -45,17 +47,16 @@ namespace TimeManager {
                 })
                 .AddTo(_disposable);
 
-            // ReadTimeValueの変化に伴って表示するテキスト情報を更新
+            // ReadyTimeValueの変化に伴って表示するテキスト情報を更新
             _timeParameter.ReadyTimeValue
-                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.READYCLEANING)
                 .Subscribe(value => {
                     _timeViwer.SetReadyTimeText(value);
                 })
                 .AddTo(_disposable);
 
-            // ReadTimeValueが0となったら、ゲームステータスをCLEANINGに変更
+            // ReadyTimeValueが0となったら、ゲームステータスをCLEANINGに変更
             _timeParameter.ReadyTimeValue
-                .Where(value => value == 0)
+                .FirstOrDefault(value => value == 0)
                 .Subscribe(_ => {
                     _gameStatusManager.ChangeGameStatus(GameStatus.CLEANING);
                     _timeViwer.VisibleReadyTimeText(false);
@@ -64,15 +65,14 @@ namespace TimeManager {
 
             // ゲームステータスがCLEANINGとなったら、TimeValueのカウントダウン開始
             _gameStatusManager.IGameStatus
-                .Where(status => status == GameStatus.CLEANING)
+                .FirstOrDefault(status => status == GameStatus.CLEANING)
                 .Subscribe(_ => {
                     _timeParameter.PlayTimeCountDownAsync(token).Forget();
                 })
                 .AddTo(_disposable);
             
             // TimeValueの変化に伴って表示するテキスト情報を更新
-            _timeParameter.TimeValue
-                .Where(_ => _gameStatusManager.IGameStatus.Value == GameStatus.CLEANING)
+            _timeParameter.TimeValue                
                 .Subscribe(value => {
                     _timeViwer.SetTimeText(value);
                 })
@@ -80,15 +80,23 @@ namespace TimeManager {
 
             // TimeValue0になったら、ゲームステータスをRESULTに変更
             _timeParameter.TimeValue
-                .Where(value => value == 0)
+                .FirstOrDefault(value => value == 0)
                 .Subscribe(timeValue => {
                     _gameStatusManager.ChangeGameStatus(GameStatus.RESULT);
                 })
                 .AddTo(_disposable);
+
+            // RESULTになったらキャンセルのシグナルを送信する
+            _gameStatusManager.IGameStatus
+                .FirstOrDefault(status => status == GameStatus.RESULT)
+                .Subscribe(_ => {
+                    _tokenSource.Cancel();
+                })
+                .AddTo(_disposable);                
         }
 
         void IDisposable.Dispose()
-        {
+        {            
             _disposable.Dispose();
         }
     }

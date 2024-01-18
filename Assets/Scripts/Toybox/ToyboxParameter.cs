@@ -5,6 +5,9 @@ using UnityEngine;
 
 using UniRx;
 
+using VContainer;
+using VContainer.Unity;
+
 using Toys;
 
 namespace Toybox {
@@ -28,10 +31,23 @@ namespace Toybox {
         public IReadOnlyReactiveProperty<int> Score => _score;
         private IntReactiveProperty _score = new IntReactiveProperty(0);
 
+        /// <summary>
+        /// クリアに必要なスコア
+        /// </summary>
+        private int _cleardScore;
+
+        /// <summary>
+        /// クリアフラグ
+        /// </summary>
+        public IReadOnlyReactiveProperty<bool> IsCleard => _isCleard;
+        private BoolReactiveProperty _isCleard = new BoolReactiveProperty(false);
+
         private readonly ToyRepository _toyRepository;
 
+        [Inject]
         public ToyboxParameter(ToyRepository toyRepository)
         {
+            _cleardScore = 5;
             _toyRepository = toyRepository;
         }
         
@@ -79,10 +95,12 @@ namespace Toybox {
         public void UpdateScore()
         {
             int tmp_score = _containToys.Sum(id => _toyRepository.GetToyPoint(id));
-            if (tmp_score > 100) {
-                _score.Value = 100;
+            if (tmp_score >= _cleardScore) {
+                _score.Value = _cleardScore;
+                _isCleard.Value = true;
             } else {
                 _score.Value = tmp_score;
+                _isCleard.Value = false;
             }
         }
     }

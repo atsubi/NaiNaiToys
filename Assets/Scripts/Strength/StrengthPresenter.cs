@@ -8,11 +8,13 @@ using VContainer;
 using VContainer.Unity;
 using System;
 using Players;
+using Manager;
 
 namespace Strength {
 
     public class StrengthPresenter : IStartable, IDisposable
     {
+        private readonly GameStatusManager _gameStatusManager;
         private readonly StrengthParameter _strengthParameter;
         private readonly StrengthViewer _strengthViewer;
         private readonly PlayerMover _playerMover;
@@ -21,8 +23,9 @@ namespace Strength {
         private CompositeDisposable _disposable = new CompositeDisposable();
 
         [Inject]
-        public StrengthPresenter(StrengthViewer strengthViewer, StrengthParameter strengthParameter, PlayerMover playerMover, PlayerToyHolder playerToyHolder)
+        public StrengthPresenter(GameStatusManager gameStatusManager, StrengthViewer strengthViewer, StrengthParameter strengthParameter, PlayerMover playerMover, PlayerToyHolder playerToyHolder)
         {
+            this._gameStatusManager = gameStatusManager;
             this._strengthViewer = strengthViewer;
             this._strengthParameter = strengthParameter;
             this._playerMover = playerMover;
@@ -32,13 +35,22 @@ namespace Strength {
 
         void IStartable.Start()
         {
+
+            // Ready時は移動フラグとストレングスゲージを初期化
+            this._gameStatusManager.IGameStatus
+                .Where( status => status == GameStatus.READYCLEANING)
+                .Subscribe(_ => {
+                    this._playerMover.SetCanMoveFlag(true);
+                    this._strengthParameter.ResetStrength();
+                })
+                .AddTo(_disposable);
             
             // ストレングスゲージが0になったら、おもちゃを落として、満タンになるまで動けなくする
             this._strengthParameter.StrengthValue
                 .Where(value => value == 0.0f)
                 .Subscribe(_ => {
                     this._playerToyHolder.HoldAction(false);
-                    this._playerMover.setCanMoveFlag(false);
+                    this._playerMover.SetCanMoveFlag(false);
                     this._strengthViewer.GrayUIPanel();
                 })
                 .AddTo(_disposable);
@@ -48,7 +60,7 @@ namespace Strength {
             this._strengthParameter.StrengthValue
                 .Where(value => value == 100.0f)
                 .Subscribe(_ => {
-                    this._playerMover.setCanMoveFlag(true);
+                    this._playerMover.SetCanMoveFlag(true);
                     this._strengthViewer.WhiteUIPanel();
                 })
                 .AddTo(_disposable);

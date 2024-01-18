@@ -28,6 +28,9 @@ namespace Players {
         /// <returns></returns>
         void IInputProvider.InitializeInputEvent()
         {
+            _holdAction.AddTo(this.gameObject);
+            _moveDirection.AddTo(this.gameObject);
+
             this.UpdateAsObservable()
                 .Select(_ => Input.GetMouseButton(0))
                 .DistinctUntilChanged()
@@ -35,12 +38,12 @@ namespace Players {
                     Debug.Log("Hold");
                     _holdAction.Value = x;
                 })
-                .AddTo(this);
+                .AddTo(this.gameObject);
 
             this.UpdateAsObservable()
                 .Select(_ => new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 2.0f))
                 .Subscribe(x => _moveDirection.SetValueAndForceNotify(x))
-                .AddTo(this);
+                .AddTo(this.gameObject);
             
             _uniTaskCompletionSource.TrySetResult();
         }

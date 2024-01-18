@@ -36,7 +36,16 @@ namespace Strength
         }
 
         /// <summary>
-        /// ストレングスゲージを回復させる 
+        /// ストレングスゲージをリセットする
+        /// </summary>
+        public void ResetStrength()
+        {
+            _strengthValue.Value = 100.0f;
+        }
+
+
+        /// <summary>
+        /// ストレングスゲージを回復させる(動ける時)
         /// </summary>
         /// <returns></returns>
         public void RecoveryStrengthCanMove() {
@@ -47,8 +56,8 @@ namespace Strength
             }
         }
 
-                /// <summary>
-        /// ストレングスゲージを回復させる 
+        /// <summary>
+        /// ストレングスゲージを回復させる(動けない時)
         /// </summary>
         /// <returns></returns>
         public void RecoveryStrengthCannotMove() {

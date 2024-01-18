@@ -8,7 +8,7 @@ using VContainer;
 using VContainer.Unity;
 
 namespace Anger {
-    public class AngerParameter
+    public class AngerParameter : IDisposable
     {
         public IReadOnlyReactiveProperty<float> AngerValue => _angerValue;
         
@@ -17,6 +17,9 @@ namespace Anger {
         
         public IReadOnlyReactiveProperty<float> AddAngerValue => _addAngerValue;
         private ReactiveProperty<float> _addAngerValue;
+
+        private  CompositeDisposable _disposable = new CompositeDisposable();
+
 
         [Inject]
         public AngerParameter(float initAngerValue, float initAddAngerValue)
@@ -32,6 +35,9 @@ namespace Anger {
             }
             _angerValue = new ReactiveProperty<float>(initAngerValue);
             _addAngerValue = new ReactiveProperty<float>(initAddAngerValue);
+
+            _angerValue.AddTo(_disposable);
+            _addAngerValue.AddTo(_disposable);
         }
 
         /// <summary>
@@ -70,6 +76,9 @@ namespace Anger {
                 _angerValue.Value += _addAngerValue.Value;
             }
         }
+
+
+        void IDisposable.Dispose() => _disposable.Dispose();
 
     }
 }

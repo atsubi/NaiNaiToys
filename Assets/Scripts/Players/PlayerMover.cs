@@ -37,6 +37,14 @@ namespace Players {
         }
 
         /// <summary>
+        /// プレイヤーを初期位置に移動させる
+        /// </summary>
+        public void InitializePlayerPosition()
+        {
+            transform.position = new Vector3(0.0f, 0.0f, 2.0f);
+        }
+
+        /// <summary>
         /// 引数で指定した量を移動する
         /// </summary>
         /// <param name="v"></param>
@@ -54,8 +62,11 @@ namespace Players {
             this._velocity.Value = _baseVelocity - _baseVelocity * (weight/100.0f);
         }
 
-
-        public void setCanMoveFlag(bool flag)
+        /// <summary>
+        /// 移動フラグを更新する
+        /// </summary>
+        /// <param name="flag"></param>
+        public void SetCanMoveFlag(bool flag)
         {
             _canMove.Value = flag;
         }

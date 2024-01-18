@@ -26,7 +26,7 @@ namespace Toys {
 
         public ToyPresenter(GameObject toyObject, ToyParameter toyParameter)
         {
-            _toyObject = toyObject;
+            _toyObject = toyObject;            
             _toyParameter = toyParameter;
         }
 

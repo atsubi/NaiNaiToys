@@ -45,12 +45,19 @@ namespace Toybox {
         {
             await _iAcceptToyProvider.CompleteAcceptToyEventSetting;
 
+            // ゲームステータスがReadyとなったら、クリアフラグをリセットし、おもちゃ箱を空っぽにする
+            _gameStatusManager.IGameStatus
+                .FirstOrDefault(status => status == GameStatus.READYCLEANING)
+                .Subscribe(_ => {
+                    _toyboxParameter.ResetToybox();
+                })
+                .AddTo(_disposable);
+
             // おもちゃが入れられたら、
             // 怒りゲージを減らし
             // おもちゃ箱に入っているおもちゃリストを更新し、おもちゃを削除する
             _iAcceptToyProvider.IAcceptToy
                 .Where(collision => collision != null)
-                .Do(collision => Debug.Log(collision.gameObject.name))
                 .Where(collision => collision.gameObject.GetComponent<IHoldable>() != null)
                 .Where(collision => collision.gameObject.GetComponent<ToyIdGettter>() != null)
                 .Subscribe(collision => {
@@ -75,12 +82,11 @@ namespace Toybox {
                 })
                 .AddTo(_disposable);
 
-            // スコアが100になったら、ゲームクリア
-            _toyboxParameter.Score
-                .Where(score => score == 100)
+            // スコアがクリア値になったら、ゲームクリア
+            _toyboxParameter.IsCleard
+                .FirstOrDefault(value => value == true)
                 .Subscribe(_ => {
                     _gameStatusManager.ChangeGameStatus(GameStatus.RESULT);
-                    Debug.Log("CLEAR!");
                 })
                 .AddTo(_disposable);
         }
